@@ -52,8 +52,15 @@ export default class {
               }
             }
           })
+
+          // ORDERED BILLS FROM EARLIEST TO LATEST
+          const comparatorByDate = (a,b) => {                                                       // Trier la date
+            return a.date.localeCompare(b.date)                                                     
+        }    
           console.log('length', bills.length)
-        return bills
+          console.log('bills :')
+          console.table(bills)
+        return bills.sort(comparatorByDate)
       })
     }
   }
