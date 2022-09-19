@@ -19,7 +19,19 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
+    console.log('filePath :' + filePath)
     const fileName = filePath[filePath.length-1]
+    console.log('fileName :' + fileName)
+
+    //VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (JPG, JPEG, PNG) 
+    try {
+      this.checkFileExtension(fileName)
+    }
+    catch(error) {
+      console.error(error)
+      return
+    }
+
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
@@ -40,6 +52,19 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
+  /**
+   * CHECK IF THE FILE'S EXTENSION IS AUTHORISED (jpg, jpeg, png)
+   * @param {*} fileName 
+   * @returns true if the file's extension is correct
+   */
+  checkFileExtension = fileName => {
+    if (fileName.indexOf("jpg") != -1 || fileName.indexOf("jpeg") != -1 || fileName.indexOf("png") != -1 ) {
+      return true
+    }
+    throw "Extension is not authorised"
+  }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
