@@ -88,6 +88,11 @@ export default class {
   handleEditTicket(e, bill, bills) {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
+    
+    console.log('hendleEditTicket counter :' + this.counter)
+    console.log('handleEditTicket id :' + this.id)
+    console.log('this.counter % 2 :' + this.counter % 2)
+
     if (this.counter % 2 === 0) {
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
@@ -131,6 +136,9 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
+
+    console.log('handleShowTickets :' + index)
+
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
@@ -145,8 +153,9 @@ export default class {
       this.counter ++
     }
 
+    //BUGS ON THE DISPLAY OF EXPENSES REPORTS IN THE ADMIN DASHBOARD
     bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      $(`#open-bill${bill.id}`).off("click").on("click", ((e) => this.handleEditTicket(e, bill, bills)))
     })
 
     return bills
