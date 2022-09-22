@@ -23,7 +23,7 @@ export default class NewBill {
     const fileName = filePath[filePath.length-1]
     console.log('fileName :' + fileName)
 
-    //VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (JPG, JPEG, PNG) 
+    //******************* VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (SHOULD BE :JPG/ JPEG/ PNG) 
     try {
       this.checkFileExtension(fileName)
     }
@@ -53,7 +53,7 @@ export default class NewBill {
       }).catch(error => console.error(error))
   }
 
-  /**
+  /************************
    * CHECK IF THE FILE'S EXTENSION IS AUTHORISED (jpg, jpeg, png)
    * @param {*} fileName 
    * @returns true if the file's extension is correct

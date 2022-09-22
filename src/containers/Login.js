@@ -42,7 +42,7 @@ export default class Login {
     const user = {
       type: "Admin",
 
-      // BUG ADMIN LOGIN PAGE : data-testid="EMPLOYEE-email-input" => data-testid="ADMIN-email-input" line 46 and 47
+      //****************** BUG ADMIN LOGIN PAGE : data-testid="EMPLOYEE-email-input" => data-testid="ADMIN-email-input" line 46 and 47
       email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,
       password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value,
 
