@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import {getAllByTestId, screen, waitFor} from "@testing-library/dom"
+import userEvent from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
@@ -41,5 +42,43 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+
+    //*********** NEW TESTS
+    describe("When I click on iconEye", () => {
+    
+    //************** TEST FUNCTION HANDLECLICKONEYE
+      test("Then modale file should be open", async () => {
+
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        }))
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+        await waitFor(() => screen.getAllByTestId('icon-eye'))
+        const eyeIcons = screen.getAllByTestId('icon-eye')
+        
+        expect(eyeIcons.length).toEqual(4)
+
+        userEvent.click(
+          eyeIcons[0]
+        )
+        const modaleFile = document.querySelector('#modaleFile')
+        expect(modaleFile.classList.contains('show')).toBe(true)
+
+        
+      })
+
+
+    })
   })
 })
+
+//**************** TEST D'INTEGRATION GET
+
+// describe("Given I am a user connected as Employee", () => {
+//   describe("")
+// })
