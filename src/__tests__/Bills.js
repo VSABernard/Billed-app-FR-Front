@@ -47,7 +47,7 @@ describe("Given I am connected as an employee", () => {
     describe("When I click on iconEye", () => {
     
     //************** TEST FUNCTION HANDLECLICKONEYE
-      test("Then modale file should be open", async () => {
+      test("Then modal file should be open", async () => {
 
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
@@ -67,9 +67,7 @@ describe("Given I am connected as an employee", () => {
           eyeIcons[0]
         )
         const modaleFile = document.querySelector('#modaleFile')
-        expect(modaleFile.classList.contains('show')).toBe(true)
-
-        
+        expect(modaleFile.classList.contains('show')).toBe(true)        
       })
 
 
