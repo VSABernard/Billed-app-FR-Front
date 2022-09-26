@@ -8,11 +8,13 @@ import {fireEvent, getAllByTestId, screen, waitFor} from "@testing-library/dom"
 import userEvent from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import mockStore from '../__mocks__/store'
 import router from "../app/Router.js";
 import Bills from '../containers/Bills.js'
+
+jest.mock('../app/store', () => mockStore)
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -51,24 +53,35 @@ describe("Given I am connected as an employee", () => {
 
     describe("When I click on iconEye", () => {
       test("Then modal file should be open", async () => {
+      // HTML construction
+      document.body.innerHTML = BillsUI({ data: bills })
 
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        router()
-        window.onNavigate(ROUTES_PATH.Bills)
-        await waitFor(() => screen.getAllByTestId('icon-eye'))
-        const eyeIcons = screen.getAllByTestId('icon-eye')
-        
-        expect(eyeIcons.length).toEqual(4)
+      // MOCK STORE
+      const store = null
 
-        fireEvent.click(eyeIcons[0])
-        const modaleFile = document.querySelector('#modaleFile')
-        expect(modaleFile.classList.contains('show')).toBe(false)        
+      // BEHAVIOURS
+      const billsList = new Bills({
+         document,
+         onNavigate,
+         store,
+         localStorage: window.localStorage,
+       })
+
+      //MOCK MODAL
+      $.fn.modal = jest.fn()
+      const eye = screen.getAllByTestId("icon-eye")[0]
+      const handleClickIconEye = jest.fn(() =>
+        billsList.handleClickIconEye(eye)
+      )
+
+      eye.addEventListener("click", handleClickIconEye)
+      fireEvent.click(eye)
+      expect(handleClickIconEye).toHaveBeenCalled()
+      
+      await waitFor(() => screen.getByRole('dialog'))
+      const modal = screen.getByRole('dialog')
+      expect(modal).toHaveClass('show')
+
       })
     })
 
@@ -98,7 +111,7 @@ describe("Given I am connected as an employee", () => {
 
         const btnNewBill = screen.getAllByTestId('btn-new-bill')
         btnNewBill.addEventListener("click", jest.fn(getBillsToDisplay.handleClickNewBill))
-        fireEvent.click(btnNewBill)
+        userEvent.click(btnNewBill)
         
         const textSendBill = screen.getByText("Envoyer une note de frais")
         expect(textSendBill).toBe(true)        
