@@ -49,10 +49,10 @@ describe("Given I am connected as an employee", () => {
     })
 
     //*********** NEW TESTS
-    //************** TEST FUNCTION HANDLECLICKONEYE
+    //************** TEST FUNCTION HANDLECLICKICONEYE
 
-    describe("When I click on iconEye", () => {
-      test("Then modal file should be open", async () => {
+    describe("When I am on Bills page and I click on iconEye", () => {
+      test("Then a modal file should be open", async () => {
       // HTML construction
       document.body.innerHTML = BillsUI({ data: bills })
 
@@ -87,13 +87,14 @@ describe("Given I am connected as an employee", () => {
 
     //************** TEST FUNCTION HANDLECLICKNEWBILL
 
-    describe("When I click on button : Add new bill", () => {
-      test("Then page should display form : Send new bill", async () => {
+    describe("When I am on Bills page and I click on button : Add new bill", () => {
+      test("Then I should be send on a New Bill page", async () => {
 
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
         }))
+        
         const root = document.createElement("div")
         root.setAttribute("id", "root")
         document.body.append(root)
@@ -104,20 +105,20 @@ describe("Given I am connected as an employee", () => {
           document,
           onNavigate,
           store: mockStore,
+          bills: bills,
           localStorage: window.localStorage,
         })
 
-        await waitFor(() => screen.getAllByTestId('btn-new-bill'))
+        await waitFor(() => screen.getByText('Nouvelle note de frais'))
 
-        const btnNewBill = screen.getAllByTestId('btn-new-bill')
+        const btnNewBill = screen.getByText('Nouvelle note de frais')
         btnNewBill.addEventListener("click", jest.fn(getBillsToDisplay.handleClickNewBill))
         userEvent.click(btnNewBill)
         
         const textSendBill = screen.getByText("Envoyer une note de frais")
-        expect(textSendBill).toBe(true)        
+        expect(textSendBill).toBeTruthy()        
       })
     })
-
 
 
   })
