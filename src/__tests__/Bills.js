@@ -90,7 +90,6 @@ describe("Given I am connected as an employee", () => {
 
     describe("When I am on Bills page and I click on button : Add new bill", () => {
       test("Then I should be send on a New Bill page", async () => {
-
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
@@ -121,12 +120,24 @@ describe("Given I am connected as an employee", () => {
       })
     })
 
-
+    //**************** TEST LOADER
+    describe("When I am on Bills page but it is loading", () => {
+      test("Then the loader should be rendered", async () => {
+        document.body.innerHTML = BillsUI({ loading: true })
+        expect(screen.getAllByText('Loading...')).toBeTruthy()
+      })
+    })
   })
 })
 
-//**************** TEST D'INTEGRATION GET
+  //**************** TEST D'INTEGRATION GET
 
-// describe("Given I am a user connected as Employee", () => {
-//   describe("")
-// })
+describe("Given I am a user connected as Employee", () => {
+  describe("When I navigate to Bills but an error message is shown", () => {
+    test('Then, Error page should be rendered', () => {
+      document.body.innerHTML = BillsUI({ error: 'some error message' })
+      expect(screen.getAllByText('Erreur')).toBeTruthy()
+      document.body.innerHTML = ""
+    })
+  })
+})
