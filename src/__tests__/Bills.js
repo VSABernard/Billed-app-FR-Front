@@ -53,35 +53,36 @@ describe("Given I am connected as an employee", () => {
 
     describe("When I am on Bills page and I click on iconEye", () => {
       test("Then a modal file should be open", async () => {
-      // HTML construction
-      document.body.innerHTML = BillsUI({ data: bills })
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+  
+        document.body.innerHTML = BillsUI({ data: bills })
+        const billPage = new Bills({
+          document,
+          onNavigate,
+          store: mockStore,
+          localStorage: window.localStorage,
+        })
+        
+        // CREATE A MOCK FUNCTION FOR MODAL
+        $.fn.modal = jest.fn() 
 
-      // MOCK STORE
-      const store = null
+        const btnEye = screen.getAllByTestId("icon-eye")      // icon-eye IS AN ARRAY
 
-      // BEHAVIOURS
-      const billsList = new Bills({
-         document,
-         onNavigate,
-         store,
-         localStorage: window.localStorage,
-       })
-
-      //MOCK MODAL
-      $.fn.modal = jest.fn()
-      const eye = screen.getAllByTestId("icon-eye")[0]
-      const handleClickIconEye = jest.fn(() =>
-        billsList.handleClickIconEye(eye)
-      )
-
-      eye.addEventListener("click", handleClickIconEye)
-      fireEvent.click(eye)
-      expect(handleClickIconEye).toHaveBeenCalled()
-      
-      await waitFor(() => screen.getByRole('dialog'))
-      const modal = screen.getByRole('dialog')
-      expect(modal).toHaveClass('show')
-
+        // MOCK DE LA fn
+        const handleClickIconEye = jest.fn((eyeBTN) => {
+          billPage.handleClickIconEye(eyeBTN)
+        })
+  
+        btnEye.forEach((elt) => {
+          // EVENEMENT SUR CHAQUE ELEMENT DE L'ARRAY
+          elt.addEventListener("click", () => handleClickIconEye(elt))
+          userEvent.click(elt)
+        })
+  
+        expect(handleClickIconEye).toHaveBeenCalled()
+        expect(screen.getByText("Justificatif")).toBeTruthy()
       })
     })
 
@@ -94,7 +95,7 @@ describe("Given I am connected as an employee", () => {
         window.localStorage.setItem('user', JSON.stringify({
           type: 'Employee'
         }))
-        
+
         const root = document.createElement("div")
         root.setAttribute("id", "root")
         document.body.append(root)
@@ -115,7 +116,7 @@ describe("Given I am connected as an employee", () => {
         btnNewBill.addEventListener("click", jest.fn(getBillsToDisplay.handleClickNewBill))
         userEvent.click(btnNewBill)
         
-        const textSendBill = screen.getByText("Envoyer une note de frais")
+        const textSendBill = screen.getByText('Envoyer une note de frais')
         expect(textSendBill).toBeTruthy()        
       })
     })

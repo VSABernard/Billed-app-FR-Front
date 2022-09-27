@@ -89,9 +89,9 @@ export default class {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     
-    console.log('hendleEditTicket counter :' + this.counter)
-    console.log('handleEditTicket id :' + this.id)
-    console.log('this.counter % 2 :' + this.counter % 2)
+    // console.log('hendleEditTicket counter :' + this.counter)
+    // console.log('handleEditTicket id :' + this.id)
+    // console.log('this.counter % 2 :' + this.counter % 2)
 
     if (this.counter % 2 === 0) {
       bills.forEach(b => {
@@ -137,7 +137,7 @@ export default class {
 
   handleShowTickets(e, bills, index) {
 
-    console.log('handleShowTickets :' + index)
+    // console.log('handleShowTickets :' + index)
 
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
