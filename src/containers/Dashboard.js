@@ -153,7 +153,7 @@ export default class {
       this.counter ++
     }
 
-    //BUGS ON THE DISPLAY OF EXPENSES REPORTS IN THE ADMIN DASHBOARD
+    //************* BUGS ON THE DISPLAY OF EXPENSES REPORTS IN THE ADMIN DASHBOARD
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).off("click").on("click", ((e) => this.handleEditTicket(e, bill, bills)))
     })
