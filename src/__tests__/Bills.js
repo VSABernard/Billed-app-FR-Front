@@ -47,97 +47,112 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+  })
 
-    //*********** NEW TESTS
-    //************** TEST FUNCTION HANDLECLICKICONEYE
-
-    describe("When I am on Bills page and I click on iconEye", () => {
-      test("Then a modal file should be open", async () => {
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname })
-        }
-  
+  //*********** NEW TESTS
+  //************** TEST FUNCTION HANDLECLICKICONEYE
+  describe("When I am on Bills page and I click on iconEye", () => {
+    test("Then a modal file should be open", async () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
         document.body.innerHTML = BillsUI({ data: bills })
-        const billPage = new Bills({
-          document,
-          onNavigate,
-          store: mockStore,
-          localStorage: window.localStorage,
-        })
-        
-        // CREATE A MOCK FUNCTION FOR MODAL
-        $.fn.modal = jest.fn() 
+      const billPage = new Bills({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+      
+      // CREATE A MOCK FUNCTION FOR MODAL
+      $.fn.modal = jest.fn() 
 
-        const btnEye = screen.getAllByTestId("icon-eye")      // icon-eye IS AN ARRAY
+      const btnEye = screen.getAllByTestId("icon-eye")      // icon-eye IS AN ARRAY
 
-        // MOCK DE LA fn
-        const handleClickIconEye = jest.fn((eyeBTN) => {
-          billPage.handleClickIconEye(eyeBTN)
-        })
-  
+      // MOCK DE LA fn
+      const handleClickIconEye = jest.fn((eyeBTN) => {
+        billPage.handleClickIconEye(eyeBTN)
+      })
         btnEye.forEach((elt) => {
-          // EVENEMENT SUR CHAQUE ELEMENT DE L'ARRAY
-          elt.addEventListener("click", () => handleClickIconEye(elt))
-          userEvent.click(elt)
-        })
-  
+        // EVENEMENT SUR CHAQUE ELEMENT DE L'ARRAY
+        elt.addEventListener("click", () => handleClickIconEye(elt))
+        userEvent.click(elt)
+      })
         expect(handleClickIconEye).toHaveBeenCalled()
-        expect(screen.getByText("Justificatif")).toBeTruthy()
-      })
-    })
-
-    //************** TEST FUNCTION HANDLECLICKNEWBILL
-
-    describe("When I am on Bills page and I click on button : Add new bill", () => {
-      test("Then I should be send on a New Bill page", async () => {
-        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee'
-        }))
-
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.append(root)
-        router()
-        window.onNavigate(ROUTES_PATH.NewBill)
-
-        const getBillsToDisplay = new Bills({
-          document,
-          onNavigate,
-          store: mockStore,
-          bills: bills,
-          localStorage: window.localStorage,
-        })
-
-        await waitFor(() => screen.getByText('Nouvelle note de frais'))
-
-        const btnNewBill = screen.getByText('Nouvelle note de frais')
-        btnNewBill.addEventListener("click", jest.fn(getBillsToDisplay.handleClickNewBill))
-        userEvent.click(btnNewBill)
-        
-        const textSendBill = screen.getByText('Envoyer une note de frais')
-        expect(textSendBill).toBeTruthy()        
-      })
-    })
-
-    //**************** TEST LOADER
-    describe("When I am on Bills page but it is loading", () => {
-      test("Then the loader should be rendered", async () => {
-        document.body.innerHTML = BillsUI({ loading: true })
-        expect(screen.getAllByText('Loading...')).toBeTruthy()
-      })
+      expect(screen.getByText("Justificatif")).toBeTruthy()
     })
   })
+
+  //************** TEST FUNCTION HANDLECLICKNEWBILL
+  describe("When I am on Bills page and I click on button : Add new bill", () => {
+    test("Then I should be send on a New Bill page", async () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.NewBill)
+      const getBillsToDisplay = new Bills({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+      await waitFor(() => screen.getByText('Nouvelle note de frais'))
+      const btnNewBill = screen.getByText('Nouvelle note de frais')
+      btnNewBill.addEventListener("click", jest.fn(getBillsToDisplay.handleClickNewBill))
+      userEvent.click(btnNewBill)
+      
+      const textSendBill = screen.getByText('Envoyer une note de frais')
+      expect(textSendBill).toBeTruthy()        
+    })
+  })
+
+  //**************** TEST LOADER
+  describe("When I am on Bills page but it is loading", () => {
+    test("Then the loader should be rendered", async () => {
+      document.body.innerHTML = BillsUI({ loading: true })
+      expect(screen.getAllByText('Loading...')).toBeTruthy()
+    })
+  })
+
+//******************* TEST ERROR MESSAGE
+  describe("When I navigate to Bills but an error message is shown", () => {
+      test('Then, Error page should be rendered', () => {
+        document.body.innerHTML = BillsUI({ error: 'some error message' })
+        expect(screen.getAllByText('Erreur')).toBeTruthy()
+        document.body.innerHTML = ""
+      })
+    })
 })
 
   //**************** TEST D'INTEGRATION GET
 
 describe("Given I am a user connected as Employee", () => {
-  describe("When I navigate to Bills but an error message is shown", () => {
-    test('Then, Error page should be rendered', () => {
-      document.body.innerHTML = BillsUI({ error: 'some error message' })
-      expect(screen.getAllByText('Erreur')).toBeTruthy()
-      document.body.innerHTML = ""
+  describe('When I navigate to Bills Page', () => {
+    test('Then the bills are fetched from the simulated API GET', async () => {
+      localStorage.setItem(
+        'user',
+        JSON.stringify({ type: 'Employee', email: 'a@a' })
+      )
+
+      const root = document.createElement('div')
+      root.setAttribute('id', 'root')
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      await waitFor(() => screen.getByText('Mes notes de frais'))
+      const newBillButton = screen.getByText('Nouvelle note de frais')
+      expect(newBillButton).toBeTruthy()
     })
+
+
+
+
+
   })
 })
