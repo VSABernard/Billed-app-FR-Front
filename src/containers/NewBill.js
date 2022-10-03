@@ -19,16 +19,16 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
-    console.log('filePath :' + filePath)
+    // console.log('filePath :' + filePath)
     const fileName = filePath[filePath.length-1]
-    console.log('fileName :' + fileName)
+    // console.log('fileName :' + fileName)
 
     //******************* VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (SHOULD BE :JPG/ JPEG/ PNG) 
     try {
       this.checkFileExtension(fileName)
     }
     catch(error) {
-      console.error(error)
+      // console.error(error)
       return
     }
 
@@ -46,7 +46,7 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
+        // console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName

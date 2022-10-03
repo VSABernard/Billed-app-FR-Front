@@ -41,20 +41,52 @@ describe("Given I am connected as an employee", () => {
   })
 
   describe("When I am on NewBill Page", () => {
-    describe("When I am on NewBill page", () => {
 
-      //********** EMAIL ICON VERTICAL HIGHLIGHTED
+      //********** TEST EMAIL ICON VERTICAL HIGHLIGHTED
       test('Then email icon in vertical layout should be highlighted', async () => {
         const emailIcon = screen.getByTestId("icon-mail");
         expect(emailIcon.classList.contains("active-icon")).toBe(true)
       })
     })
 
-    test("Then ...", () => {
+  describe("When I am on NewBill Page and I upload a file with an extension other than jpg, jpeg or png", () => {
+    
+    //*********** TEST FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG
+    test("Then an error message for the input should be displayed", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
+
       //to-do write assertion
-      
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: null,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+
+      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
+
+      const fileInput = screen.getByTestId('file')
+      fileInput.addEventListener('change', handleChangeFile)
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.pdf', {
+              type: 'application/pdf',
+            }),
+          ],
+        },
+      })
+
+      expect(handleChangeFile).toHaveBeenCalled()
+
+      expect(fileInput.files[0].name).toBe('test.pdf')
+
+      const errorMessage = screen.getByTestId('error')
+
+      expect(errorMessage).not.toHaveClass('hidden')
     })
 })
 
