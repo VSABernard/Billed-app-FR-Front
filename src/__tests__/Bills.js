@@ -51,6 +51,7 @@ describe("Given I am connected as an employee", () => {
 
   //*********** NEW TESTS
   //************** TEST FUNCTION HANDLECLICKICONEYE
+
   describe("When I am on Bills page and I click on iconEye", () => {
     test("Then a modal file should be open", async () => {
       const onNavigate = (pathname) => {
@@ -65,6 +66,7 @@ describe("Given I am connected as an employee", () => {
       })
       
       // CREATE A MOCK FUNCTION FOR MODAL
+
       $.fn.modal = jest.fn() 
 
       const btnEye = screen.getAllByTestId("icon-eye")      // icon-eye IS AN ARRAY
@@ -84,6 +86,7 @@ describe("Given I am connected as an employee", () => {
   })
 
   //************** TEST FUNCTION HANDLECLICKNEWBILL
+
   describe("When I am on Bills page and I click on button : Add new bill", () => {
     test("Then I should be send on a New Bill page", async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
@@ -113,6 +116,7 @@ describe("Given I am connected as an employee", () => {
   })
 
   //**************** TEST LOADER
+
   describe("When I am on Bills page but it is loading", () => {
     test("Then the loader should be rendered", async () => {
       document.body.innerHTML = BillsUI({ loading: true })
@@ -121,6 +125,7 @@ describe("Given I am connected as an employee", () => {
   })
 
 //******************* TEST ERROR MESSAGE
+
   describe("When I navigate to Bills but an error message is shown", () => {
       test('Then, Error page should be rendered', () => {
         document.body.innerHTML = BillsUI({ error: 'some error message' })
@@ -133,6 +138,9 @@ describe("Given I am connected as an employee", () => {
   //**************** TEST D'INTEGRATION GET
 
 describe("Given I am a user connected as Employee", () => {
+
+  //*************** TEST FETCH BILLS FROM API GET
+
   describe('When I navigate to Bills Page', () => {
     test('Then the bills are fetched from the simulated API GET', async () => {
       localStorage.setItem(
@@ -149,10 +157,41 @@ describe("Given I am a user connected as Employee", () => {
       const newBillButton = screen.getByText('Nouvelle note de frais')
       expect(newBillButton).toBeTruthy()
     })
+  })
 
+  //**************** TEST ERRORS ON API
 
+  describe('When an error occurs on API', () => {
+    beforeEach(() => {
+      jest.spyOn(mockStore, 'bills')
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem(
+        'user',
+        JSON.stringify({
+          type: 'Employee',
+          email: 'a@a',
+        })
+      )
+      const root = document.createElement('div')
+      root.setAttribute('id', 'root')
+      document.body.appendChild(root)
+      router()
+    })
 
+    //*************** TEST ERROR 404
 
-
+    test('fetches bills from an API and fails with 404 message error', async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error('Erreur 404'))
+          },
+        }
+      })
+      window.onNavigate(ROUTES_PATH.Bills)
+      await new Promise(process.nextTick)
+      const message = screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+      })      
   })
 })
