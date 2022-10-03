@@ -192,6 +192,22 @@ describe("Given I am a user connected as Employee", () => {
       await new Promise(process.nextTick)
       const message = screen.getByText(/Erreur 404/)
       expect(message).toBeTruthy()
-      })      
+      })
+  
+    //*************** TEST ERROR 500
+  
+    test('fetches messages from an API and fails with 500 message error', async () => {
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          list: () => {
+            return Promise.reject(new Error('Erreur 500'))
+          },
+        }
+      })
+      window.onNavigate(ROUTES_PATH.Bills)
+      await new Promise(process.nextTick)
+      const message = screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+      })
   })
 })
