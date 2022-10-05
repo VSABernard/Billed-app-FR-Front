@@ -134,12 +134,29 @@ describe("Given I am connected as an employee", () => {
 //************ TEST INTEGRATION POST
 
 describe('Given I am connected as an employéé', () => {
+  beforeEach(() => {
+    const html = NewBillUI()
+    document.body.innerHTML = html
+
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    })
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "jhondoe@mail.com",
+      })
+    )
+  })
+
   describe('When I am on NewBill page and submit a valid form', () => {
+
+    //************* TEST A VALID SUBMIT FORM HAVE BEEN ADDED
     test('Then a new bill should have been added', async() => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-
       const newBill = new NewBill({
         document,
         onNavigate,
@@ -147,31 +164,26 @@ describe('Given I am connected as an employéé', () => {
         localStorage: window.localStorage,
       })
 
-      const inputName = screen.getByTestId("expense-name")
-      fireEvent.change(inputName, { target: { value: "Achat bureau" } })
-      const inputAmount = screen.getByTestId("amount")
-      fireEvent.change(inputAmount, { target: { value: "175" } })
-      const inputDate = screen.getByTestId("datepicker")
-      fireEvent.change(inputDate, { target: { value: new Date() } })
-      const inputPct = screen.getByTestId("pct")
-      fireEvent.change(inputPct, { target: { value: "25" } })
       const inputFile = document.querySelector(`input[data-testid="file"]`)
+      const onFileChange = jest.fn(newBill.handleChangeFile)
+
       const eventLoadFilePNG = {
         target: {
-          files: [new File(["..."], "test.png", { type: "document/png" })],
+          files: [new File(['...'], 'test.png', { type: 'document/png' })],
         },
       }
+
+      inputFile.addEventListener('change', onFileChange)
       fireEvent.change(inputFile, eventLoadFilePNG)
 
-      const submitNewBill = jest.fn(newBill.handleSubmit)
-      const form = screen.getByTestId("form-new-bill")
-
-      form.addEventListener("submit", submitNewBill)
-      fireEvent.submit(form)
-
-      expect(submitNewBill).toHaveBeenCalled()
-      expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+      expect(inputFile.files.length).toBe(1)
+      expect(onFileChange).toHaveBeenCalled()
+      expect(inputFile.files[0].name).toBe('test.png')
     })
+
+    
+
+
   })
 })
 
