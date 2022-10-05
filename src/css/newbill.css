@@ -22,6 +22,20 @@
   border-radius: 5px;
 }
 
+.blue-border.error {
+  border: 2px solid red !important;
+}
+
+/* NewBills's ERROR MESSAGE FOR UPLOADING FILE OTHER THAN PNG-JPG-JPEG */
+span.errorMessage {
+  color: red;
+  font-weight: bold;
+}
+span.errorMessage.hidden {
+  display: none;
+}
+
+
 label {
   font-style: normal;
   font-weight: 500;

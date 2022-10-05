@@ -18,24 +18,30 @@ export default class NewBill {
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    // console.log('filePath :' + filePath)
-    const fileName = filePath[filePath.length-1]
-    // console.log('fileName :' + fileName)
-
-    //******************* VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (SHOULD BE :JPG/ JPEG/ PNG) 
-    try {
-      this.checkFileExtension(fileName)
-    }
-    catch(error) {
-      // console.error(error)
-      return
-    }
-
+    // const filePath = e.target.value.split(/\\/g)
+    // const fileName = filePath[filePath.length-1]
+    const fileName = file.name
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
     formData.append('email', email)
+    
+    //******************* VERIFICATION OF THE FILE'S EXTENSION WHICH IS UPLOADED BY THE EMPLOYEE (SHOULD BE :JPG/ JPEG/ PNG) 
+    
+    const errorMessage = this.document.querySelector('span.errorMessage')
+    
+    if(fileName === '') {
+      errorMessage.classList.add('hidden')
+      return
+    }
+    
+    try {
+      this.checkFileExtension(fileName)
+    }
+    catch(error) {
+      errorMessage.classList.remove('hidden')   
+      return
+    }    
 
     this.store
       .bills()

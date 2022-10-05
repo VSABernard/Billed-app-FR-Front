@@ -3,6 +3,7 @@
  */
 
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
+import userEvent from "@testing-library/user-event"
 import '@testing-library/jest-dom'
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
@@ -150,9 +151,8 @@ describe('Given I am connected as an employéé', () => {
     )
   })
 
-  describe('When I am on NewBill page and submit a valid form', () => {
-
-    //************* TEST A VALID SUBMIT FORM HAVE BEEN ADDED
+  //************* TEST A VALID SUBMIT FORM HAVE BEEN ADDED
+  describe('When I am on NewBill page and submit a valid form', () => {    
     test('Then a new bill should have been added', async() => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
@@ -180,10 +180,41 @@ describe('Given I am connected as an employéé', () => {
       expect(onFileChange).toHaveBeenCalled()
       expect(inputFile.files[0].name).toBe('test.png')
     })
-
-    
-
-
   })
+
+  //************* TEST A NON VALID FORM SUBMITED THEN AN ERROR MSG DISPLAYED
+  describe('When I am on NewBill page and submit a non valid form', () => {  
+    test("Then an error message should be displayed", async () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+
+      const inputFile = document.querySelector(`input[data-testid="file"]`)
+      const error = screen.getByTestId('error')
+      const onFileChange = jest.fn((e) => newBill.handleChangeFile(e))
+
+      const filePDF = new File(['img'], 'test.pdf', { type: 'text/png' })
+
+      const extension = /([a-z 0-9])+(.jpg|.jpeg|.png)/gi
+
+      inputFile.addEventListener('change', onFileChange)
+      userEvent.upload(inputFile, filePDF)
+
+      expect(onFileChange).toHaveBeenCalled()
+      expect(inputFile.files[0]).toStrictEqual(filePDF)
+      expect(inputFile.files[0].name).not.toMatch(extension)
+      expect(error).toBeTruthy()
+    })
+  })
+
+
+
 })
 
