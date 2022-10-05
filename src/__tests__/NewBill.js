@@ -51,12 +51,12 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on NewBill Page and I upload a file with an extension other than jpg, jpeg or png", () => {
     
-    //*********** TEST FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG
-    test("Then an error message for the input should be displayed", () => {
+    //*********** TEST FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG : DISPLAY ERROR MESSAGE
+    test("Then an error message for the file input should be displayed", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
 
-      //to-do write assertion
+      // PROPOSE THESE BEHAVIORS FOR THE CONSTRUCTION OF THE PAGE
       const newBill = new NewBill({
         document,
         onNavigate,
@@ -65,10 +65,12 @@ describe("Given I am connected as an employee", () => {
         localStorage: window.localStorage,
       })
 
-      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
+      // MOCK THE CALLED FUNCTION
+      const handleChangeFileMock = jest.fn((e) => newBill.handleChangeFile(e))
 
+      // RETRIEVE THE INPUT OF THE FILE TO ADD
       const fileInput = screen.getByTestId('file')
-      fileInput.addEventListener('change', handleChangeFile)
+      fileInput.addEventListener('change', handleChangeFileMock)
 
       fireEvent.change(fileInput, {
         target: {
@@ -80,13 +82,52 @@ describe("Given I am connected as an employee", () => {
         },
       })
 
-      expect(handleChangeFile).toHaveBeenCalled()
+      expect(handleChangeFileMock).toHaveBeenCalled()
 
       expect(fileInput.files[0].name).toBe('test.pdf')
 
       const errorMessage = screen.getByTestId('error')
 
       expect(errorMessage).not.toHaveClass('hidden')
+    })
+
+    //*********** TEST FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG : NO ERROR MESSAGE
+    test('Then no error message should be displayed', () => {
+      document.body.innerHTML = NewBillUI()
+
+      // PROPOSE THESE BEHAVIORS FOR THE CONSTRUCTION OF THE PAGE
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+
+      // MOCK THE CALLED FUNCTION
+      const handleChangeFileMock = jest.fn((e) => newBill.handleChangeFile(e))
+
+      // RETRIEVE THE INPUT OF THE FILE TO ADD
+      const fileInput = screen.getByTestId('file')
+      fileInput.addEventListener('change', handleChangeFileMock)
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.jpg', {
+              type: 'image/jpeg',
+            }),
+          ],
+        },
+      })
+
+      expect(handleChangeFileMock).toHaveBeenCalled()
+
+      expect(fileInput.files[0].name).toBe('test.jpg')
+
+      const errorMessage = screen.getByTestId('error')
+
+      expect(errorMessage.classList.contains('active')).toBeFalsy()
     })
 })
 
