@@ -41,7 +41,7 @@ describe("Given I am connected as an employee", () => {
     document.body.innerHTML = ""
   })
 
-  //********** TEST EMAIL ICON VERTICAL HIGHLIGHTED
+  //********** TEST UNIT : EMAIL ICON VERTICAL HIGHLIGHTED
   describe("When I am on NewBill Page", () => {
       test('Then email icon in vertical layout should be highlighted', async () => {
         const emailIcon = screen.getByTestId("icon-mail");
@@ -49,7 +49,7 @@ describe("Given I am connected as an employee", () => {
       })
     })
     
-  //*********** TEST FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG : DISPLAY ERROR MESSAGE
+  //*********** TEST UNIT : FILE UPLOADED EXTENSION OTHER THAN JPG, JPEG, PNG : DISPLAY ERROR MESSAGE
   describe("When I am on NewBill page and I upload a file with an extension other than jpg, jpeg or png", () => {
     beforeEach(() => {
       const html = NewBillUI()
@@ -102,7 +102,7 @@ describe("Given I am connected as an employee", () => {
   })
 
 
-  //*********** TEST FILE UPLOADED EXTENSION ON JPG, JPEG, PNG : NO ERROR MESSAGE
+  //*********** TEST UNIT : FILE UPLOADED EXTENSION ON JPG, JPEG, PNG : NO ERROR MESSAGE
   describe("When I am on NewBill page and I upload a file with an extension jpg, jpeg or png", () => {
     beforeEach(() => {
       const html = NewBillUI()
@@ -161,11 +161,80 @@ describe("Given I am connected as an employee", () => {
 //************ TEST INTEGRATION POST
 
 describe('Given I am connected as an employéé', () => {
- 
+  beforeEach(() => {
+    const html = NewBillUI()
+    document.body.innerHTML = html
+        Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    })
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "jhondoe@mail.com",
+      })
+    )
+  })
+
   //************* TEST A VALID SUBMIT FORM HAVE BEEN ADDED
   describe('When I am on NewBill page and submit a valid form', () => {    
-    test('Then a new bill should have been added', async() => {
-      
+    it('Then a new bill should have been added', async() => {
+      // AS WE CALL A CLASS WITH PARAMETERS WE CALL THIS CLASS
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+
+      // THE DOM'S ELEMENTS
+      const formulaire = screen.getByTestId('form-new-bill')
+      const inputSelect = screen.getByTestId('expense-type')
+      const inputName = screen.getByTestId('expense-name')
+      const inputDate = screen.getByTestId('datepicker')
+      const inputAmount = screen.getByTestId('amount')
+      const inputVAT = screen.getByTestId('vat')
+      const inputPCT = screen.getByTestId('pct')
+      const inputCom = screen.getByTestId('commentary')
+      const inputFile = screen.getByTestId('file')
+
+      const file = new File(['img'], 'bill.jpg', { type: 'image/jpg' })
+
+      // THE EXPECTED FORMAT OF THE FORM
+      const formValues = {
+        type: 'Fornitures de bureau',
+        name: 'Bureau en bois de teck',
+        date: '2022-10-01',
+        amount: '150',
+        vat: 20,
+        pct: 10,
+        commentary: 'Bureau du chef de projet',
+        file: file,
+      }
+
+      // https://testing-library.com/docs/dom-testing-library/api-events/#fireeventeventname
+      fireEvent.change(inputSelect, { target: { value: formValues.type } })
+      fireEvent.change(inputName, { target: { value: formValues.name } })
+      fireEvent.change(inputDate, { target: { value: formValues.date } })
+      fireEvent.change(inputAmount, { target: { value: formValues.amount } })
+      fireEvent.change(inputVAT, { target: { value: formValues.vat } })
+      fireEvent.change(inputPCT, { target: { value: formValues.pct } })
+      fireEvent.change(inputCom, { target: { value: formValues.commentary } })
+      userEvent.upload(inputFile, formValues.file)
+
+      // SIMULATION OF FUNCTION + LISTENER + SUBMIT
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      formulaire.addEventListener('submit', handleSubmit)
+      fireEvent.submit(formulaire)
+
+      expect(handleSubmit).toHaveBeenCalled()
+      expect(inputSelect.validity.valid).not.toBeTruthy()
+      expect(inputName.validity.valid).toBeTruthy()
+      expect(inputDate.validity.valid).toBeTruthy()
+      expect(inputVAT.validity.valid).toBeTruthy()
+      expect(inputPCT.validity.valid).toBeTruthy()
+      expect(inputCom.validity.valid).toBeTruthy()
+      expect(inputFile.files[0]).toBeDefined()      
     })
   })
 
