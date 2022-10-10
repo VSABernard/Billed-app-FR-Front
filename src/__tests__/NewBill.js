@@ -82,7 +82,7 @@ describe("Given I am connected as an employee", () => {
       })
 
       const inputFile = document.querySelector(`input[data-testid="file"]`)
-      const error = screen.getByTestId('error')
+      const errorMessage = screen.getByTestId('error')
 
       // MOCK THE CALLED FUNCTION
       const onFileChange = jest.fn((e) => newBill.handleChangeFile(e))
@@ -97,7 +97,7 @@ describe("Given I am connected as an employee", () => {
       expect(onFileChange).toHaveBeenCalled()
       expect(inputFile.files[0]).toStrictEqual(filePDF)
       expect(inputFile.files[0].name).not.toMatch(extension)
-      expect(error).toBeTruthy()
+      expect(errorMessage).not.toHaveClass('hidden')
     })
   })
 
@@ -148,12 +148,10 @@ describe("Given I am connected as an employee", () => {
       fireEvent.change(fileInput, eventLoadFilePNG)
 
       expect(handleChangeFileMock).toHaveBeenCalled()
-
       expect(fileInput.files[0].name).toBe('test.jpg')
 
       const errorMessage = screen.getByTestId('error')
-
-      expect(errorMessage.classList.contains('active')).toBeFalsy()
+      expect(errorMessage.classList).toContain('hidden')
     })
   })
 })
@@ -164,14 +162,12 @@ describe('Given I am connected as an employéé and on NewBill page', () => {
   beforeEach(() => {
     const html = NewBillUI()
     document.body.innerHTML = html
-        Object.defineProperty(window, "localStorage", {
-      value: localStorageMock,
-    })
+    Object.defineProperty(window, "localStorage", {value: localStorageMock})
     window.localStorage.setItem(
       "user",
       JSON.stringify({
         type: "Employee",
-        email: "jhondoe@mail.com",
+        email: "email@email.com",
       })
     )
   })
@@ -238,7 +234,7 @@ describe('Given I am connected as an employéé and on NewBill page', () => {
     })
   })
 
-  //************* TEST A NON VALID FORM SUBMITED THEN AN ERROR MSG DISPLAYED
+  //************* TEST A NON VALID FORM SUBMITED THEN WE SHOULD STAY ON NEW BILL PAGE
   describe('When I submit a non valid form', () => {  
     it("Then I should stay on New Bill page", async () => {
       // AS WE CALL A CLASS WITH PARAMETERS WE CALL THIS CLASS
@@ -277,6 +273,71 @@ describe('Given I am connected as an employéé and on NewBill page', () => {
     })
   })
 
-  
+  //************* TEST ERROR 404
+  describe("When an error 404 occurres on submit", () => {
+    it("Then a warning should be displayed on console", async () => {
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+
+      // ERROR SIMULATION
+      jest.spyOn(mockStore, 'bills')
+      console.error = jest.fn()
+
+      // mockImplementationOnce : Accepts a function that will be used as an implementation of the mock for one call to the mocked function. 
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          update: () => {
+            return Promise.reject(new Error('Erreur 404'))
+          },
+        }
+      })
+
+      const formulaire = screen.getByTestId('form-new-bill')
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      formulaire.addEventListener('submit', handleSubmit)
+      fireEvent.submit(formulaire)
+
+      await new Promise(process.nextTick)
+      expect(console.error).toBeCalled()
+    })
+  })
+
+  //************* TEST ERROR 500
+  describe("When an error 500 occurres on submit", () => {
+    it("Then a warning should be displayed on console", async () => {
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+
+      // ERROR SIMULATION
+      jest.spyOn(mockStore, 'bills')
+      console.error = jest.fn()
+
+      // mockImplementationOnce : Accepts a function that will be used as an implementation of the mock for one call to the mocked function. 
+      mockStore.bills.mockImplementationOnce(() => {
+        return {
+          update: () => {
+            return Promise.reject(new Error('Erreur 500'))
+          },
+        }
+      })
+
+      const formulaire = screen.getByTestId('form-new-bill')
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      formulaire.addEventListener('submit', handleSubmit)
+      fireEvent.submit(formulaire)
+
+      await new Promise(process.nextTick)
+      expect(console.error).toBeCalled()
+    })
+  })
+
 
 })
