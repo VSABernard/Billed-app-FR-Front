@@ -160,7 +160,7 @@ describe("Given I am connected as an employee", () => {
 
 //************ TEST INTEGRATION POST
 
-describe('Given I am connected as an employéé', () => {
+describe('Given I am connected as an employéé and on NewBill page', () => {
   beforeEach(() => {
     const html = NewBillUI()
     document.body.innerHTML = html
@@ -177,7 +177,7 @@ describe('Given I am connected as an employéé', () => {
   })
 
   //************* TEST A VALID SUBMIT FORM HAVE BEEN ADDED
-  describe('When I am on NewBill page and submit a valid form', () => {    
+  describe('When I submit a valid form', () => {    
     it('Then a new bill should have been added', async() => {
       // AS WE CALL A CLASS WITH PARAMETERS WE CALL THIS CLASS
       const newBill = new NewBill({
@@ -239,9 +239,41 @@ describe('Given I am connected as an employéé', () => {
   })
 
   //************* TEST A NON VALID FORM SUBMITED THEN AN ERROR MSG DISPLAYED
-  describe('When I am on NewBill page and submit a non valid form', () => {  
-    test("Then an error message should be displayed", async () => {
-      
+  describe('When I submit a non valid form', () => {  
+    it("Then I should stay on New Bill page", async () => {
+      // AS WE CALL A CLASS WITH PARAMETERS WE CALL THIS CLASS
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: window.localStorage,
+      })
+
+      // EMPTY INPUT TEST
+      expect(screen.getByTestId('expense-type')).toBeTruthy()
+      expect(screen.getByTestId('expense-name').value).toBe("")
+      expect(screen.getByTestId('datepicker').value).toBe("")
+      expect(screen.getByTestId('amount').value).toBe("")
+      expect(screen.getByTestId('vat').value).toBe("")
+      expect(screen.getByTestId('pct').value).toBe("")
+      expect(screen.getByTestId('commentary').value).toBe("")
+      expect(screen.getByTestId('file').value).toBe("")
+
+      // SEND FORM TEST
+      // WE CAPTURE THE FORM
+      const form = document.querySelector(`form[data-testid= 'form-new-bill']`)
+
+      // WE SIMULATE A CALL FUNCTION
+      const handleFormSubmit = jest.fn((evt) => newBill.handleSubmit(evt))
+
+      // WE CAPTURE THE EVENT
+      form.addEventListener('submit', handleFormSubmit)
+
+      // I SUBMIT THE FORM
+      fireEvent.submit(form)
+
+      expect(handleFormSubmit).toHaveBeenCalled()
+      expect(form).toBeTruthy()
     })
   })
 
