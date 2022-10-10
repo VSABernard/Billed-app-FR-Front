@@ -269,7 +269,46 @@ describe("Given that I am a user on login page", () => {
     })
   })
 
+//************* TEST FOR ERROR DURING ADMIN SUBMIT
+describe("When I click on admin button Login In and an error occurs", () => {
+  test("Then a new user should have been created", async () => {
+    document.body.innerHTML = LoginUI()
+    const inputEmailUser = screen.getByTestId('admin-email-input')
 
+    fireEvent.change(inputEmailUser, {
+      target: { value: 'adminError@email.com' },
+    })
+
+    const inputPasswordUser = screen.getByTestId('admin-password-input')
+    fireEvent.change(inputPasswordUser, { target: { value: 'azerty' } })
+
+    const form = screen.getByTestId('form-admin')
+
+    // MOCK THE NAVIGATION TO TEST IT
+    const onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname })
+    }
+    const store = null;
+    let PREVIOUS_LOCATION = ""
+
+    const login = new Login({
+      document,
+      localStorage: window.localStorage,
+      onNavigate,
+      PREVIOUS_LOCATION,
+      store,
+    })
+
+    const handleSubmit = jest.fn(login.handleSubmitAdmin)
+    login.login = jest.fn().mockRejectedValue(new Error('Error'))
+    form.addEventListener('submit', handleSubmit)
+    fireEvent.submit(form)
+
+    expect(handleSubmit).toHaveBeenCalled()
+    expect(login.login).toHaveBeenCalled()
+    expect(login.login).toReturn()
+  })
+})
 
 
 
