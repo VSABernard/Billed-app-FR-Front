@@ -17,11 +17,15 @@ export default class NewBill {
   }
 
   handleChangeFile = e => {
+    
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     // const filePath = e.target.value.split(/\\/g)
     // const fileName = filePath[filePath.length-1]
-    const fileName = file.name
+    let fileName = ''
+    if(file !== undefined){
+      fileName = file.name
+    }
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
@@ -37,7 +41,9 @@ export default class NewBill {
     }
     
     try {
-      this.checkFileExtension(fileName)
+      if (this.checkFileExtension(fileName)) {
+        errorMessage.classList.add('hidden')
+      }
     }
     catch(error) {
       errorMessage.classList.remove('hidden')   
